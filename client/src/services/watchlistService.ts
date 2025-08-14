@@ -27,6 +27,22 @@ class WatchlistService {
     const data = await res.json();
     return data.watchlist || [];
   }
+
+  async addToWatchlist(item: WatchlistItem): Promise<void> {
+    const token = authService.getToken();
+    const res = await fetch(this.baseURL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(item),
+    });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw new Error(error.message || "Failed to add to watchlist");
+    }
+  }
 }
 
 export const watchlistService = new WatchlistService();

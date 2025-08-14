@@ -153,7 +153,7 @@ class AuthService {
   // Register new user
   async register(
     userData: RegisterCredentials
-  ): Promise<{ user: User; accessToken: string }> {
+  ): Promise<{ user: User; accessToken: string; refreshToken: string }> {
     try {
       console.log("Attempting to register user...");
 
@@ -185,11 +185,12 @@ class AuthService {
       console.log("Registration successful");
 
       // Store tokens
-      this.setTokens(data.tokens.accessToken, data.tokens.refreshToken);
+      this.setTokens(data.accessToken, data.refreshToken);
 
       return {
         user: data.user,
-        accessToken: data.tokens.accessToken,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
       };
     } catch (error) {
       console.error("Registration error:", error);
@@ -205,7 +206,7 @@ class AuthService {
   // Login user
   async login(
     credentials: LoginCredentials
-  ): Promise<{ user: User; accessToken: string }> {
+  ): Promise<{ user: User; accessToken: string; refreshToken: string }> {
     try {
       console.log("Attempting to login user...");
 
@@ -230,11 +231,12 @@ class AuthService {
       console.log("Login successful");
 
       // Store tokens
-      this.setTokens(data.tokens.accessToken, data.tokens.refreshToken);
+      this.setTokens(data.accessToken, data.refreshToken);
 
       return {
         user: data.user,
-        accessToken: data.tokens.accessToken,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
       };
     } catch (error) {
       console.error("Login error:", error);

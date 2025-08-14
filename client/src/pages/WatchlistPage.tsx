@@ -6,14 +6,15 @@ import { watchlistService } from "../services/watchlistService";
 import type { WatchlistItem } from "../services/watchlistService";
 import AuthModal from "../components/AuthModal";
 
-
-
 const WatchlistPage: React.FC = () => {
   const navigate = useNavigate();
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
-  const [filteredWatchlist, setFilteredWatchlist] = useState<WatchlistItem[]>([]);
+  const [filteredWatchlist, setFilteredWatchlist] = useState<WatchlistItem[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "movies" | "tv">("all");
+  const [sortBy, setSortBy] = useState<"dateAdded" | "title" | "rating">(
     "dateAdded"
   );
   const { isAuthenticated } = useAuth();
@@ -27,7 +28,8 @@ const WatchlistPage: React.FC = () => {
     }
     setShowAuthModal(false);
     setLoading(true);
-    watchlistService.getWatchlist()
+    watchlistService
+      .getWatchlist()
       .then((data) => {
         setWatchlist(data);
         setFilteredWatchlist(data);
@@ -37,47 +39,6 @@ const WatchlistPage: React.FC = () => {
         setFilteredWatchlist([]);
       })
       .finally(() => setLoading(false));
-  }, [isAuthenticated]);
-
-    checkAuth();
-  }, []);
-
-  // Mock watchlist data (replace with actual API calls)
-  useEffect(() => {
-    const loadWatchlist = () => {
-      if (!isAuthenticated) return;
-
-      // Mock data - replace with actual API call
-      const mockWatchlist: WatchlistEntry[] = [
-        {
-          id: 550,
-          title: "Fight Club",
-          type: "movie",
-          poster_path: "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
-          release_date: "1999-10-15",
-          vote_average: 8.4,
-          overview:
-            "A ticking-time-bomb insomniac and a slippery soap salesman channel primal male aggression into a shocking new form of therapy.",
-          dateAdded: "2024-01-15",
-        },
-        {
-          id: 1399,
-          name: "Game of Thrones",
-          type: "tv",
-          poster_path: "/u3bZgnGQ9T01sWNhyveQz0wH0Hl.jpg",
-          first_air_date: "2011-04-17",
-          vote_average: 8.3,
-          overview:
-            "Seven noble families fight for control of the mythical land of Westeros.",
-          dateAdded: "2024-01-20",
-        },
-      ];
-
-      setWatchlist(mockWatchlist);
-      setFilteredWatchlist(mockWatchlist);
-    };
-
-    loadWatchlist();
   }, [isAuthenticated]);
 
   // Filter and sort watchlist
@@ -203,10 +164,20 @@ const WatchlistPage: React.FC = () => {
           <p>Loading your watchlist...</p>
         </div>
       </div>
-  if (showAuthModal) {
-    return <>{<AuthModal isOpen={true} onClose={() => setShowAuthModal(false)} initialTab="login" />}</>;
+    );
   }
-      </div>
+
+  if (showAuthModal) {
+    return (
+      <>
+        {
+          <AuthModal
+            isOpen={true}
+            onClose={() => setShowAuthModal(false)}
+            initialTab="login"
+          />
+        }
+      </>
     );
   }
 

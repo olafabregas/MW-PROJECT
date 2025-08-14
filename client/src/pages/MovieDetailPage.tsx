@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { tmdbService } from "../services/tmdbService";
 import { reviewService } from "../services/reviewService";
+import { watchlistService } from "../services/watchlistService";
 import type { MovieDetails, Movie } from "../services/tmdbService";
 import type { UserReview } from "../services/reviewService";
 import { useAuth } from "../hooks/useAuth";
@@ -47,7 +48,9 @@ const MovieDetailPage: React.FC = () => {
   const [similarMovies, setSimilarMovies] = useState<Movie[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [userReviews, setUserReviews] = useState<UserReview[]>([]);
-  const [currentUserReview, setCurrentUserReview] = useState<UserReview | null>(null);
+  const [currentUserReview, setCurrentUserReview] = useState<UserReview | null>(
+    null
+  );
   const [trailerKey, setTrailerKey] = useState<string>("");
   const [showTrailer, setShowTrailer] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -97,12 +100,18 @@ const MovieDetailPage: React.FC = () => {
 
         // Fetch backend user reviews
         try {
-          const backendReviews = await reviewService.getMovieReviews(parseInt(id), 1, 10);
+          const backendReviews = await reviewService.getMovieReviews(
+            parseInt(id),
+            1,
+            10
+          );
           setUserReviews(backendReviews.reviews);
 
           // If user is authenticated, check for their existing review
           if (isAuthenticated) {
-            const existingReview = await reviewService.getUserMovieReview(parseInt(id));
+            const existingReview = await reviewService.getUserMovieReview(
+              parseInt(id)
+            );
             if (existingReview) {
               setCurrentUserReview(existingReview);
               setUserRating(existingReview.rating);
@@ -111,7 +120,7 @@ const MovieDetailPage: React.FC = () => {
             }
           }
         } catch (reviewError) {
-          console.warn('Failed to fetch backend reviews:', reviewError);
+          console.warn("Failed to fetch backend reviews:", reviewError);
           // Continue without backend reviews if server is unavailable
         }
 
@@ -137,9 +146,26 @@ const MovieDetailPage: React.FC = () => {
   }, [id, isAuthenticated]);
 
   const handleAddToWatchlist = async () => {
-    // TODO: Implement backend integration for watchlist
-    console.log("Adding to watchlist:", movie?.id);
-    alert("Watchlist feature coming soon! This will connect to your backend.");
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      return;
+    }
+    if (!movie) return;
+    try {
+      await watchlistService.addToWatchlist({
+        id: movie.id,
+        type: "movie",
+        title: movie.title,
+        poster_path: movie.poster_path || "",
+        release_date: movie.release_date || "",
+        vote_average: movie.vote_average,
+        overview: movie.overview || "",
+        dateAdded: new Date().toISOString(), // still required by WatchlistItem type, but ignored by backend
+      });
+      alert("Added to your watchlist!");
+    } catch (err) {
+      alert("Failed to add to watchlist. Please try again later.");
+    }
   };
 
   const formatRuntime = (minutes: number) => {
@@ -206,7 +232,7 @@ const MovieDetailPage: React.FC = () => {
 
     try {
       setSubmittingReview(true);
-      
+
       const reviewData = {
         movieId: parseInt(id!),
         movieTitle: movie.title,
@@ -227,10 +253,10 @@ const MovieDetailPage: React.FC = () => {
           }
         );
         setCurrentUserReview(updatedReview);
-        
+
         // Update in the reviews list
-        setUserReviews(prev => 
-          prev.map(review => 
+        setUserReviews((prev) =>
+          prev.map((review) =>
             review.id === updatedReview.id ? updatedReview : review
           )
         );
@@ -238,13 +264,18 @@ const MovieDetailPage: React.FC = () => {
         // Create new review
         const newReview = await reviewService.createReview(reviewData);
         setCurrentUserReview(newReview);
-        setUserReviews(prev => [newReview, ...prev]);
+        setUserReviews((prev) => [newReview, ...prev]);
       }
 
-      alert(`Review ${currentUserReview ? 'updated' : 'submitted'} successfully!`);
+      alert(
+        `Review ${currentUserReview ? "updated" : "submitted"} successfully!`
+      );
     } catch (error) {
       console.error("Failed to submit review:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to submit review. Please try again.";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to submit review. Please try again.";
       alert(errorMessage);
     } finally {
       setSubmittingReview(false);
@@ -496,7 +527,11 @@ const MovieDetailPage: React.FC = () => {
             {activeTab === "reviews" && (
               <div className="reviews-content">
                 <div className="user-review-section">
-                  <h2>{currentUserReview ? 'Update Your Review' : 'Rate & Review This Movie'}</h2>
+                  <h2>
+                    {currentUserReview
+                      ? "Update Your Review"
+                      : "Rate & Review This Movie"}
+                  </h2>
                   {!isAuthenticated ? (
                     <div className="login-prompt">
                       <p>Please log in to rate and review this movie.</p>
@@ -542,14 +577,19 @@ const MovieDetailPage: React.FC = () => {
                         className="submit-review-btn"
                         onClick={handleSubmitReview}
                         disabled={
-                          submittingReview || !userRating || !userReview.trim() || !reviewTitle.trim()
+                          submittingReview ||
+                          !userRating ||
+                          !userReview.trim() ||
+                          !reviewTitle.trim()
                         }
                       >
-                        {submittingReview ? (
-                          currentUserReview ? 'Updating Review...' : 'Submitting Review...'
-                        ) : (
-                          currentUserReview ? 'Update Review' : 'Submit Review'
-                        )}
+                        {submittingReview
+                          ? currentUserReview
+                            ? "Updating Review..."
+                            : "Submitting Review..."
+                          : currentUserReview
+                          ? "Update Review"
+                          : "Submit Review"}
                       </button>
                     </div>
                   )}
@@ -572,14 +612,18 @@ const MovieDetailPage: React.FC = () => {
                                   />
                                 ) : (
                                   <div className="avatar-placeholder">
-                                    {review.user.username.charAt(0).toUpperCase()}
+                                    {review.user.username
+                                      .charAt(0)
+                                      .toUpperCase()}
                                   </div>
                                 )}
                               </div>
                               <div className="reviewer-details">
                                 <h4>{review.user.username}</h4>
                                 <p className="review-date">
-                                  {new Date(review.createdAt).toLocaleDateString()}
+                                  {new Date(
+                                    review.createdAt
+                                  ).toLocaleDateString()}
                                 </p>
                               </div>
                             </div>
@@ -600,7 +644,7 @@ const MovieDetailPage: React.FC = () => {
                           </div>
                           {user && user.id === review.user.id && (
                             <div className="review-actions">
-                              <button 
+                              <button
                                 className="edit-review-btn"
                                 onClick={() => {
                                   setUserRating(review.rating);
@@ -624,7 +668,10 @@ const MovieDetailPage: React.FC = () => {
                     <h3>TMDB Reviews ({reviews.length})</h3>
                     <div className="reviews-list">
                       {reviews.map((review) => (
-                        <div key={review.id} className="review-card tmdb-review">
+                        <div
+                          key={review.id}
+                          className="review-card tmdb-review"
+                        >
                           <div className="review-header">
                             <div className="reviewer-info">
                               <div className="reviewer-avatar">
@@ -642,7 +689,9 @@ const MovieDetailPage: React.FC = () => {
                               <div className="reviewer-details">
                                 <h4>{review.author}</h4>
                                 <p className="review-date">
-                                  {new Date(review.created_at).toLocaleDateString()}
+                                  {new Date(
+                                    review.created_at
+                                  ).toLocaleDateString()}
                                 </p>
                                 <span className="tmdb-badge">TMDB</span>
                               </div>
@@ -655,7 +704,10 @@ const MovieDetailPage: React.FC = () => {
                                   "small"
                                 )}
                                 <span>
-                                  {(review.author_details.rating / 2).toFixed(1)}/5
+                                  {(review.author_details.rating / 2).toFixed(
+                                    1
+                                  )}
+                                  /5
                                 </span>
                               </div>
                             )}
@@ -703,7 +755,7 @@ const MovieDetailPage: React.FC = () => {
       {similarMovies.length > 0 && (
         <div className="similar-movies-section">
           <div className="similar-container">
-            <h2>Similar Movies</h2> 
+            <h2>Similar Movies</h2>
             <div className="similar-grid">
               {similarMovies.map((similarMovie) => (
                 <div
