@@ -1,0 +1,2 @@
+# This file ensures the uploads/profile-pictures directory is tracked in git
+# Actual uploaded files should be ignored by .gitignore

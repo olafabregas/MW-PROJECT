@@ -1,0 +1,53 @@
+<!-- Olympia Movie App Logo -->
+<svg width="200" height="80" viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient circle -->
+  <defs>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4af37;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ffd700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b8860b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#f8f8ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e6e6fa;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Movie reel icon -->
+  <circle cx="35" cy="40" r="25" fill="url(#goldGradient)" filter="url(#glow)"/>
+  <circle cx="35" cy="40" r="20" fill="none" stroke="#2a2a2a" stroke-width="2"/>
+  <circle cx="35" cy="40" r="8" fill="#2a2a2a"/>
+  
+  <!-- Film strip holes -->
+  <circle cx="25" cy="25" r="3" fill="#2a2a2a"/>
+  <circle cx="45" cy="25" r="3" fill="#2a2a2a"/>
+  <circle cx="25" cy="55" r="3" fill="#2a2a2a"/>
+  <circle cx="45" cy="55" r="3" fill="#2a2a2a"/>
+  
+  <!-- Laurel wreath elements -->
+  <path d="M15 35 Q10 30 15 25 Q20 30 15 35" fill="url(#goldGradient)" opacity="0.8"/>
+  <path d="M55 35 Q60 30 55 25 Q50 30 55 35" fill="url(#goldGradient)" opacity="0.8"/>
+  <path d="M15 45 Q10 50 15 55 Q20 50 15 45" fill="url(#goldGradient)" opacity="0.8"/>
+  <path d="M55 45 Q60 50 55 55 Q50 50 55 45" fill="url(#goldGradient)" opacity="0.8"/>
+  
+  <!-- Main text "OLYMPIA" -->
+  <text x="80" y="35" font-family="'Arial Black', sans-serif" font-size="24" font-weight="900" 
+        fill="url(#textGradient)" filter="url(#glow)">OLYMPIA</text>
+  
+  <!-- Subtitle -->
+  <text x="80" y="52" font-family="'Arial', sans-serif" font-size="10" font-weight="400" 
+        fill="#d4af37" letter-spacing="2px">CINEMA EXPERIENCE</text>
+  
+  <!-- Stars decoration -->
+  <polygon points="75,15 77,21 83,21 78,25 80,31 75,27 70,31 72,25 67,21 73,21" fill="url(#goldGradient)" opacity="0.6"/>
+  <polygon points="185,20 186,23 189,23 187,25 188,28 185,26 182,28 183,25 181,23 184,23" fill="url(#goldGradient)" opacity="0.4"/>
+  <polygon points="190,45 191,48 194,48 192,50 193,53 190,51 187,53 188,50 186,48 189,48" fill="url(#goldGradient)" opacity="0.4"/>
+</svg>
